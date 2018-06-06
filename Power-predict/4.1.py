@@ -49,7 +49,7 @@ def model(j):
 
 if __name__ == '__main__':
 
-    os.chdir(r'')
+    os.chdir(r'C:\Users\Chinawindey\Desktop\新建文件夹 (2)')
     df = pd.read_pickle('df_comb.pkl')
 
     # 划分训练集与测试集
@@ -61,8 +61,8 @@ if __name__ == '__main__':
     X_test = np.array(df_test.ix[:, 1:])
     y_test = np.array(df_test.ix[:, 0])
 
-    for j in [1, 2, 3]:
-        df_eval = cross_val_score(model(j), X_train, y_train, scoring='neg_mean_squared_erro', cv=5)
+    for j in [3]:
+        df_eval = cross_val_score(model(j), X_train, y_train, scoring='r2', cv=5)
         print(df_eval)
 
 

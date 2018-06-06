@@ -2,8 +2,8 @@
 """
 -------------------------------------------------
    Author :         Zeke
-   date：           2018/5/30
-   Description :    数据筛选
+   date：           2018/6/6
+   Description :    参数配置
 -------------------------------------------------
 """
 import numpy as np
@@ -15,26 +15,25 @@ import math
 
 if __name__ == '__main__':
 
-    # 定义文件路径
+    # 定义文件读取路径
     os.chdir(r'D:\00_工作日志\O\2018-06\赤峰项目故障\data\赤峰二期5min数据')
     file_name = 'CFEQ_wt1_5min_201601-201712.csv'
 
+    # 定义文件保存路径
     save_path = r'C:\Users\Chinawindey\Desktop\新建文件夹 (2)'
-    save_name = '123.csv'
 
     # 筛选的变量
-    col_name = ['r1', # 时间
-                'r43','r44','r45', # 风速，平均风速30s，平均风速10min
-                'r46', # 平均风向30s
-                'r61', # 机舱位置
-                'r86', # 环境温度
-                'r60', # 偏航夹角
-                'r72','r73','r74', # 3个叶片桨距角实际值
-                'r76','r78','r80', # 3个变桨电机温度值
-                'r3', 'r59', # 风机状态，偏航状态机
-                'r21' # 电网监测有功功率 Y
+    cols = ['r1', # 时间
+            'r43','r44','r45', # 风速，平均风速30s，平均风速10min
+            'r46', # 平均风向30s
+            'r61', # 机舱位置
+            'r86', # 环境温度
+            'r60', # 偏航夹角
+            'r72','r73','r74', # 3个叶片桨距角实际值
+            'r76','r78','r80', # 3个变桨电机温度值
+            'r3', 'r59', # 风机状态，偏航状态机
+            'r21' # 电网监测有功功率 Y
                 ]
-
 
     # 定义训练集时间
     ds = '2016-01-15'
@@ -50,7 +49,7 @@ if __name__ == '__main__':
         df = pd.read_csv(f, low_memory=False)
 
     # 切片选择的列
-    df = df.loc[:, col_name]
+    df = df.loc[:, cols]
 
     # 取值范围筛选
     df[(df['r21'] < 5) & (df['r21'] > 2200)] = np.nan # 功率异常值
@@ -66,7 +65,7 @@ if __name__ == '__main__':
     # index改为时间
     df.index = df.loc[:, 'r1']
     df.index = pd.to_datetime(df.index)
-    print(df.head())
+    # print(df.head())
 
     # 删除所有带空值的行
     df = df.dropna(how='any', axis=0)
@@ -78,8 +77,8 @@ if __name__ == '__main__':
     df['r61_cos'] = df.loc[:, 'r61'].apply(lambda x: math.cos(math.radians(x)))
     df['r61_sin'] = df.loc[:, 'r61'].apply(lambda x: math.sin(math.radians(x)))
 
-    del df['r46']
-    del df['r61']
+    del df['r46'] # 删除风向原始量
+    del df['r61'] # 删除机舱位置原始量
 
     # 偏航误差改成绝对值
     df['r60'] = np.abs(df['r60'])
@@ -90,23 +89,40 @@ if __name__ == '__main__':
     df['r78'] = df['r78'] + 273.15
     df['r80'] = df['r80'] + 273.15
 
+    #================================================
+    # 保存文件
+    os.chdir(save_path)
 
+    # 保存数值型特征
+    col_num = ['r43','r44','r45', # 风速，平均风速30s，平均风速10min
+               'r46_cos', 'r46_sin',# 平均风向30s
+               'r61_cos', 'r61_sin',# 机舱位置
+               'r86', # 环境温度
+               'r60', # 偏航夹角
+               'r72','r73','r74', # 3个叶片桨距角实际值
+               'r76','r78','r80', # 3个变桨电机温度值'
+               ]
+    df.loc[:, col_num].to_pickle('X_num.pkl')
 
-
-
+    # 保存标签y
+    df.loc[:, 'r21'].to_pickle('y.pkl')
 
     # 增加季节与月份哑向量
     df['month'] = df.loc[:, 'r1'].apply(lambda x: int(x[5:7]))
     df['season'] = (df.loc[:, 'month'] / 4 + 1).apply(math.floor)
     df1 = pd.get_dummies(df['month'], prefix='month')
     df2 = pd.get_dummies(df['season'], prefix='season')
-    df = pd.concat([df, df1, df2], axis=1)
+    df_cat = pd.concat([df1, df2], axis=1)
 
-    print(df.tail())
+    # 保存类别特征
+    df_cat.to_pickle('X_dum.pkl')
 
-    # 保存文件
-    os.chdir(save_path)
-    df.to_csv(save_name)
+    # 保存状态特征
+    df.loc[:, ['r3', 'r59']].to_pickle('X_cat.pkl')
+
+
+
+
 
 
 
