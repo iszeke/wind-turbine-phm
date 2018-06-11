@@ -65,7 +65,7 @@ def train_and_test(df, X_cat):
 
 if __name__ == '__main__':
 
-    os.chdir(r'C:\Users\Chinawindey\Desktop\123')
+    os.chdir(r'D:\00_工作日志\O\2018-06\赤峰项目故障\功率相关\01')
 
     y = pd.read_pickle('y.pkl')
     X_cat = pd.read_pickle('X_cat.pkl')
@@ -98,7 +98,7 @@ if __name__ == '__main__':
                   'reg_lambda': np.linspace(0, 1, 10),
                   }
 
-    grid = RandomizedSearchCV(model, param_dist, cv=4, scoring='r2',n_iter=10, n_jobs=-1)
+    grid = RandomizedSearchCV(model, param_dist, cv=4, scoring='neg_mean_squared_error',n_iter=30, n_jobs=-1)
 
     #在训练集上训练
     grid.fit(X_train,y_train)

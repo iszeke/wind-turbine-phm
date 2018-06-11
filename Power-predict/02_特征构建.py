@@ -95,7 +95,7 @@ class FeatureConstruct(object):
 
 if __name__ == '__main__':
 
-    os.chdir(r'C:\Users\Chinawindey\Desktop\123')
+    os.chdir(r'D:\00_工作日志\O\2018-06\赤峰项目故障\功率相关\08')
     X_num = pd.read_pickle('X_num.pkl')
     print(X_num.shape)
 

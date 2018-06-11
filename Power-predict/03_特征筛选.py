@@ -92,7 +92,7 @@ def feature_choice(X_train, y_train, X_test, y_test, save_name):
 if __name__ == '__main__':
 
     # 读取数据
-    os.chdir(r'C:\Users\Chinawindey\Desktop\123')
+    os.chdir(r'D:\00_工作日志\O\2018-06\赤峰项目故障\功率相关\01')
     y = pd.read_pickle('y.pkl')
     X_cat = pd.read_pickle('X_cat.pkl')
     X_num = pd.read_pickle('X_num.pkl')
